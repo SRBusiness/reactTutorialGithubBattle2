@@ -1,5 +1,6 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+var React = require('react');
+var PropTypes = require('prop-types');
+var api = require('../utils/api');
 
 // stateless fucntional component
 // it has no state, it recieves everything from props
@@ -11,7 +12,7 @@ function SelectLanguage(props) {
       {languages.map(function(lang) {
         return (
           <li
-            style={lang === props .selectedLanguage ? {color : '#d0021b'} : null}
+            style={lang === props.selectedLanguage ? {color : '#d0021b'} : null}
             onClick={props.onSelect.bind(null, lang)}
             // adding a unique key value
             key={lang}>
@@ -33,6 +34,40 @@ function SelectLanguage(props) {
 // any other arguements we pass after the first arguement will be passed along to the initial function
 // so this.updateLanguage.bind(null, lang) is going to return a new function with the lang argument, when we click on it the function will be invoked with the specifc lang that was clicked on.
 
+
+function RepoGrid(props){
+  return (
+    <ul className='popular-list'>
+      {props.repos.map(function(repo, index){
+        return (
+          <li
+            key={repo.name}
+            className='popular-item'
+          >
+            <div className='popular-rank'>#{index + 1}</div>
+            <ul className='space-list-items'>
+              <li>
+                <img
+                  className='avatar'
+                  src={repo.owner.avatar_url}
+                  alt={'Avatar for ' + repo.owner.login}
+                />
+              </li>
+              <li><a href={repo.html_url}>{repo.name}</a></li>
+              <li>@{repo.owner.login}</li>
+              <li>{repo.stargazers_count} stars</li>
+            </ul>
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
+
+RepoGrid.propTypes = {
+  repos: PropTypes.array.isRequired,
+}
+
 SelectLanguage.propTypes = {
   selectedLanguage: PropTypes.string.isRequired,
   onSelect: PropTypes.func.isRequired,
@@ -45,11 +80,17 @@ class Popular extends React.Component {
     super(props);
     // initial state for this component, defaults to all
     this.state = {
-      selectedLanguage: 'All'
+      selectedLanguage: 'All',
+      repos: null,
     };
     // we want updateLanguage to always refer to the specific component instance
     // goal is to make it so that the this inside update langugae is the component instance itself which will have a set state property
     this.updateLanguage = this.updateLanguage.bind(this);
+  }
+
+  // invoked by react whenever the component is mounted to the DOM
+  componentDidMount() {
+    this.updateLanguage(this.state.selectedLanguage);
   }
 
   // this function allows up to update that state
@@ -57,9 +98,20 @@ class Popular extends React.Component {
   updateLanguage(lang) {
     this.setState( function() {
       return {
-        selectedLanguage: lang
+        selectedLanguage: lang,
+        repos: null,
       };
     });
+
+    // this makes the Ajax request to github and returns items
+    api.fetchPopularRepos(lang)
+      .then((repos) => {
+        this.setState(function() {
+          return {
+            repos: repos
+          }
+        })
+      });
   }
 
   render() {
@@ -69,9 +121,14 @@ class Popular extends React.Component {
           selectedLanguage={this.state.selectedLanguage}
           onSelect={this.updateLanguage}
         />
+        {!this.state.repos ?
+          <p> LOADING </p>
+          : <RepoGrid repos={this.state.repos} />
+        }
       </div>
     )
   }
 }
 
-export default Popular;
+// need the ternay operator because it tries to render the github repos before the api promise has returned
+module.exports = Popular;
