@@ -1,13 +1,13 @@
-var React = require('react');
-var ReactRouter = require('react-router-dom');
-var Router = ReactRouter.BrowserRouter;
-var Route = ReactRouter.Route;
-var Switch = ReactRouter.Switch;
-var Nav = require('./Nav');
-var Home = require('./Home');
-var Battle = require('./Battle');
-var Popular = require('./Popular');
-var Results = require('./Results');
+import React from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+// const Router = ReactRouter.BrowserRouter;
+// const Route = ReactRouter.Route;
+// const Switch = ReactRouter.Switch;
+import Nav from './Nav';
+import Home from './Home';
+import Battle from './Battle';
+import Popular from './Popular';
+import Results from './Results';
 
 class App extends React.Component {
   render() {
@@ -16,7 +16,7 @@ class App extends React.Component {
         <div className='container'>
           <Nav />
 
-          
+
           <Switch>
             <Route exact path='/' component={Home} />
             <Route exact path='/battle' component={Battle} />
@@ -37,4 +37,5 @@ class App extends React.Component {
 // this component is only going to be rendered when a user is at /popular
 
 // using switch it will show the found found one
-module.exports = App;
+// module.exports = App;
+export default App;

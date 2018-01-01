@@ -2,10 +2,12 @@
 // var Link = require('react-router-dom').Link;
 // NavLink will allow us to dynamically change styles of anchor tag based on if that anchor tag is active. Change style based on route.
 
-var React = require('react');
-var NavLink = require('react-router-dom').NavLink;
+import React from 'react';
+// named imports
+import { NavLink } from 'react-router-dom';
+// var NavLink = require('react-router-dom').NavLink;
 
-function Nav() {
+export default function Nav() {
   return (
     <ul className='nav'>
       <li>
@@ -32,4 +34,4 @@ function Nav() {
 
 
 // export default Nav;
-module.exports = Nav;
+// module.exports = Nav;

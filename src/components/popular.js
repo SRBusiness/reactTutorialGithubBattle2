@@ -1,20 +1,20 @@
-var React = require('react');
-var PropTypes = require('prop-types');
-var api = require('../utils/api');
-var Loading = require('./Loading');
+import React from 'react';
+import PropTypes from 'prop-types';
+import { fetchPopularRepos } from '../utils/api';
+import Loading from './Loading';
 
 // stateless fucntional component
 // it has no state, it recieves everything from props
 function SelectLanguage(props) {
-  var languages = ['All', 'JavaScript', 'Ruby', 'Java', 'CSS', 'Python'];
+  const languages = ['All', 'JavaScript', 'Ruby', 'Java', 'CSS', 'Python'];
 
   return(
     <ul className='languages'>
-      {languages.map(function(lang) {
+      {languages.map((lang) => {
         return (
           <li
             style={lang === props.selectedLanguage ? {color : '#d0021b'} : null}
-            onClick={props.onSelect.bind(null, lang)}
+            onClick={ () => props.onSelect(lang)}
             // adding a unique key value
             key={lang}>
               {lang}
@@ -39,7 +39,7 @@ function SelectLanguage(props) {
 function RepoGrid(props){
   return (
     <ul className='popular-list'>
-      {props.repos.map(function(repo, index){
+      {props.repos.map((repo, index) => {
         return (
           <li
             key={repo.name}
@@ -97,7 +97,7 @@ class Popular extends React.Component {
   // this function allows up to update that state
   // passed a new language, in order to update our state
   updateLanguage(lang) {
-    this.setState( function() {
+    this.setState( () => {
       return {
         selectedLanguage: lang,
         repos: null,
@@ -105,9 +105,9 @@ class Popular extends React.Component {
     });
 
     // this makes the Ajax request to github and returns items
-    api.fetchPopularRepos(lang)
+    fetchPopularRepos(lang)
       .then((repos) => {
-        this.setState(function() {
+        this.setState( () => {
           return {
             repos: repos
           }
@@ -116,15 +116,17 @@ class Popular extends React.Component {
   }
 
   render() {
+    const { selectedLanguage, repos } = this.state
+
     return(
       <div>
         <SelectLanguage
-          selectedLanguage={this.state.selectedLanguage}
+          selectedLanguage={selectedLanguage}
           onSelect={this.updateLanguage}
         />
         {!this.state.repos
           ? <Loading />
-          : <RepoGrid repos={this.state.repos} />
+          : <RepoGrid repos={repos} />
         }
       </div>
     )
@@ -132,4 +134,4 @@ class Popular extends React.Component {
 }
 
 // need the ternay operator because it tries to render the github repos before the api promise has returned
-module.exports = Popular;
+export default Popular;

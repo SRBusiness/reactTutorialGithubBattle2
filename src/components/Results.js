@@ -1,13 +1,13 @@
-var React = require('react');
-var queryString = require('query-string');
-var api = require('../utils/api');
-var Link = require('react-router-dom').Link;
-var PropTypes = require('prop-types');
-var PlayerPreview = require('./PlayerPreview');
-var Loading = require('./Loading');
+import React from 'react';
+import queryString from 'query-string';
+import { battle } from '../utils/api';
+import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import PlayerPreview from './PlayerPreview';
+import Loading from './Loading';
 
 function Profile(props) {
-  var info = props.info;
+  let info = props.info;
 
   return(
     <PlayerPreview avatar={info.avatar_url} username={info.login}>
@@ -57,15 +57,16 @@ class Results extends React.Component {
   }
 
   componentDidMount() {
-    var players = queryString.parse(this.props.location.search);
+    // example of deconstructing something
+    const { playerOneName, playerTwoName } = queryString.parse(this.props.location.search);
 
-    api.battle([
-      players.playerOneName,
-      players.playerTwoName
+    battle([
+      playerOneName,
+      playerTwoName
     ]).then( (results) => {
       // if we don't have results
       if ( results === null ) {
-        return this.setState(function () {
+        return this.setState( () => {
           return {
             error: 'Looks like there was an error. Check that both users exist on Github',
             loading: false
@@ -73,7 +74,7 @@ class Results extends React.Component {
         });
       }
       // if we have results up date state
-      this.setState(function () {
+      this.setState( () => {
         return {
           error: null,
           winner: results[0],
@@ -85,10 +86,12 @@ class Results extends React.Component {
   }
 
   render() {
-    var error = this.state.error;
-    var winner = this.state.winner;
-    var loser = this.state.loser;
-    var loading = this.state.loading;
+    // another example of deconstruction
+    const { error, winner, loser, loading } = this.state;
+    // var error = this.state.error;
+    // var winner = this.state.winner;
+    // var loser = this.state.loser;
+    // var loading = this.state.loading;
 
     if (loading === true){
       return <Loading />
@@ -120,4 +123,4 @@ class Results extends React.Component {
   }
 }
 
-module.exports = Results;
+export default Results;
